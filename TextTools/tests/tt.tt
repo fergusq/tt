@@ -1,0 +1,63 @@
+
+start:
+	(
+		node "\n"
+		| global "\n"
+	)*
+	
+	"start:" "\n"
+	"\t"	list "\n"
+	";" "\n"
+;
+
+global:
+	"$" name=name "=" value
+;
+
+command:
+	"!" name=name name* ";"
+;
+
+node:
+	name=name ":" "\n"
+	"\t"	list "\n"
+	";" "\n"
+;
+
+list:
+	sequence (("|"|",") sequence)*
+;
+
+sequence:
+	(value " ")*
+;
+
+value:
+	(
+		(
+			[node]
+			| "$" [global]
+#			| name "=" value
+#			| global
+#			| "(" list ")"
+			| "\"" string "\""
+		)
+		| "\"" string "\""
+	) (("*"|"?")?|"{" intp "}")?
+;
+
+name:
+	("a"|"b"|"c"|"e"|"f"|"g"|"h"|"i"|"j"|"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|"x"|"y"|"z"|"-"){10}
+;
+
+string:
+	("a"|"b"|"c"|"e"|"f"|"g"|"h"|"i"|"j"|"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|"x"|"y"|"z"|" "){10}
+;
+
+int:
+	("1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"0"){2}
+;
+
+intp:
+	("1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9") ("1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"0")?
+;

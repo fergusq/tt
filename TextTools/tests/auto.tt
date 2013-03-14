@@ -1,0 +1,19 @@
+
+start:
+	koko " " väri " " auto
+;
+
+koko:
+	"suuri", "pieni"
+;
+
+väri:
+	"punainen", "keltainen", "sininen", "valkoinen"
+;
+
+auto:
+	"farmari",
+	"ford",
+	"skoda",
+	"auto"
+;

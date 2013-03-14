@@ -1,0 +1,110 @@
+# Esimerkkipalaute:
+# Neuvotteluissa päätettiin, että maatalousministerin täytyy säätää säädös rahojen käytöstä nautintotarkoituksiin ja että puheenjohtajan pitää säätää sääntö liikesalaisuuksista.
+
+start:
+	eka ", että " toka ".",
+	eka ", että " toka " ja että " toka "."
+;
+
+eka:
+	kokouksessa " " sovittiin
+;
+
+	kokouksessa:
+		"Kokouksessa",
+		"Neuvotteluissa",
+		"Komiteassa",
+		"Istunnossa"
+	;
+
+	sovittiin:
+		"sovittiin",
+		"päätettiin",
+		"säädettiin"
+	;
+	
+toka:
+	puheenjohtajan " " täytyy " " kirjoittaa
+;
+
+	puheenjohtajan:
+		"puheenjohtajan",
+		ministerin,
+		sihteerin,
+		"siivoojan",
+		johtajan
+	;
+	
+		sihteerin:
+			"sihteerin",
+			"pääsihteerin",
+			"apulaissihteerin"
+		;
+		
+		ministerin:
+			"ministerin",
+			"maatalousministerin",
+			"pääministerin",
+			"ulkoministerin",
+			"sisäministerin",
+			"opetusministerin",
+			"ympäristöministerin",
+			"valtionvarainministerin"
+		;
+		
+		johtajan:
+			"johtajan",
+			"pääjohtajan",
+			"toimitusjohtajan",
+			"maajohtajan"
+		;
+	
+	täytyy:
+		"täytyy",
+		"pitää",
+		"on pakko",
+		"tulee"
+	;
+		
+	kirjoittaa:
+		"kirjoittaa " kirja,
+		"säätää " laki,
+		"määrätä " laki,
+		"asettaa " laki
+	;
+	
+		kirja:
+			"kirja",
+			"pöytäkirja",
+			"lisäpöytäkirja",
+			"kirje",
+			"varoitus",
+			"muistiinpanoja"
+		;
+		
+		laki:
+			"laki " musiikista,
+			"säädös " musiikista,
+			"sääntö " musiikista
+		;
+		
+			musiikista:
+				"musiikista", "oppikirjoista",
+				"ympäristön tuhoamisesta",
+				"turkistarhauksesta",
+				"liikesalaisuuksista",
+				"kirjatuista kirjeistä",
+				varojen " käytöstä " nautintotarkoituksiin
+			;
+			
+				varojen:
+					"varojen",
+					"rahojen"
+				;
+				
+				nautintotarkoituksiin:
+					"nautintotarkoituksiin",
+					"vaalikampanjointiin",
+					"siivoukseen",
+					"mainostamiseen"
+				;
