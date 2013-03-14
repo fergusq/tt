@@ -69,7 +69,7 @@ public class TextToolsParser {
 		}
 
 		TokenScanner s = new TokenScanner();
-		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!', '<', '>'});
+		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!'});
 		s.setBSpecialTokens(new String[] {"::"});
 		s.setComments(true);
 		s.setPrep(false);
