@@ -1,0 +1,48 @@
+# Generates random math expressions
+
+start:
+	statement{10}
+;
+
+statement:
+	var "=" expr "\n",
+	func "(" (expr ("," expr){0,4})? ")\n"
+;
+
+var:
+	name=name
+;
+
+name:
+	"i" ("1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"0")?
+;
+
+expr:
+	(
+		expr "+" prim |
+		expr "-" prim |
+		expr "*" prim |
+		expr "/" prim |
+		"sqrt(" expr ")"
+	),
+	prim
+;
+
+prim:
+	("-"? [var]),
+	("(" expr ")"),
+	("1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"0"){2}
+;
+
+func:
+	$print
+;
+
+$print=print
+
+print:
+	"print" "ln"?,
+	"printi",
+	"print_integer",
+	"out.print" "ln"?
+;

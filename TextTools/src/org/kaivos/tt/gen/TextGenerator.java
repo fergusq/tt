@@ -30,10 +30,6 @@ import org.kaivos.tt.parser.TextToolsTree.ValueTree;
 
 public class TextGenerator {
 
-	private static class ImpossibleException extends Exception {
-		private static final long serialVersionUID = 1219484843485542860L;
-	}
-	
 	private final Random rnd;
 	
 	public TextGenerator() {
@@ -53,7 +49,7 @@ public class TextGenerator {
 	
 	private HashMap<String, String> vars = new HashMap<>();
 	
-	public String generate(StartTree tree) {
+	public String generate(StartTree tree) throws ImpossibleException {
 		start = tree;
 		
 		node = "<top>";
@@ -76,7 +72,7 @@ public class TextGenerator {
 		throw new RuntimeException("Unresolved node " + "start");
 	}
 
-	private String generateNode(NodeTree t) {
+	private String generateNode(NodeTree t) throws ImpossibleException {
 		String n = node; NodeTree _n = _node; HashMap<String, String> p = properties;
 		node = t.name; _node = t;
 		
@@ -85,7 +81,9 @@ public class TextGenerator {
 		int i = 0;
 		
 		do {
-			if (++i > t.lists.size()) throw new RuntimeException();
+			if (++i > t.lists.size()) {
+				throw new ImpossibleException();
+			}
 			int list = rnd.nextInt(t.lists.size());
 			try {
 				String s = generateList(t.lists.get(list));

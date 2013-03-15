@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.kaivos.sc.TokenScanner;
 import org.kaivos.stg.error.SyntaxError;
 import org.kaivos.stg.error.UnexpectedTokenSyntaxError;
+import org.kaivos.tt.gen.ImpossibleException;
 import org.kaivos.tt.gen.TextGenerator;
 
 public class TextToolsParser {
@@ -105,7 +106,9 @@ public class TextToolsParser {
 			TextGenerator compiler = new TextGenerator();
 			try {
 				System.out.println(compiler.generate(tree));
-			} catch (Exception e) {
+			} catch (ImpossibleException e) {
+				System.err.println("; E: ("+compiler.node+") It's impossible to generate text! There's error in " + args[args.length-1]);
+			}catch (Exception e) {
 				System.err.println("; E: ("+compiler.node+") Internal Compiler Exception");
 				e.printStackTrace();
 			}
