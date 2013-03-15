@@ -9,11 +9,10 @@ Building
 You need Apache Ant <http://ant.apache.org/>
 
 1. Download ParserTools library <http://www.kaivos.org/PT.zip> and extract it next to the TextTools folder.
-
 2. Build TextTools
 
-	$ cd TextTools
-	$ ant
+		$ cd TextTools
+		$ ant
 	
 License
 =======
