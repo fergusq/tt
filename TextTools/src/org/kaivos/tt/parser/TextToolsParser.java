@@ -88,8 +88,8 @@ public class TextToolsParser {
 		}
 
 		TokenScanner s = new TokenScanner();
-		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!'});
-		s.setBSpecialTokens(new String[] {"::"});
+		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!', '.'});
+		s.setBSpecialTokens(new String[] {"::", "=>", "?>"});
 		s.setComments(true);
 		s.setPrep(false);
 		s.init(textIn);
@@ -108,7 +108,7 @@ public class TextToolsParser {
 				System.out.println(compiler.generate(tree));
 			} catch (ImpossibleException e) {
 				System.err.println("; E: ("+compiler.node+") It's impossible to generate text! There's error in " + args[args.length-1]);
-			}catch (Exception e) {
+			} catch (Exception e) {
 				System.err.println("; E: ("+compiler.node+") Internal Compiler Exception");
 				e.printStackTrace();
 			}

@@ -133,7 +133,7 @@ public class TextToolsTree extends ParserTree {
 	
 	/*
 	 * Node = {
-	 * 		NAME ":"
+	 * 		NAME ("(" ("$" NAME ("," "$" NAME)*)? ")")? ":"
 	 * 		(LIST ("," LIST)*)?
 	 * 		";"
 	 * }
@@ -143,11 +143,30 @@ public class TextToolsTree extends ParserTree {
 		public String name;
 		public ArrayList<ListTree> lists = new ArrayList<ListTree>();
 		
+		public boolean isFunc = false;
+		public ArrayList<String> params = new ArrayList<>();
+		
 		@CompilerInfo public ArrayList<HashMap<String, String>> properties = new ArrayList<>();
 		
 		@Override
 		public void parse(TokenScanner s) throws SyntaxError {
+			if (isFunc = seek(s).equals(".")) {
+				accept(".", s);
+			}
 			name = next(s);
+			if (isFunc) {
+				accept("(", s);
+				if (!seek(s).equals(")"))
+					while (true) {
+						accept("$", s);
+						params.add(next(s));
+	
+						if (accept(new String[] { ",", ")" }, s).equals(")"))
+							break;
+					}
+				else
+					accept(")", s);
+			}
 			accept(":", s);
 			while (true) {
 				ListTree t = new ListTree();
@@ -236,7 +255,18 @@ public class TextToolsTree extends ParserTree {
 	
 	/*
 	 * Value = {
-	 * 		STRING | NAME | "[" NAME ("::" NAME)? "]" | NAME "=" VALUE | 
+	 * 		"{"::F 
+	 * 		(
+	 * 			STRING
+	 * 			| NAME
+	 * 			| "[" NAME ("::" NAME)? "]"
+	 * 			| NAME "=" VALUE
+	 * 			| "(" VALUE ")"
+	 * 			| ":" NAME
+	 * 		) ("*"|"?"|"{"INT ("," INT)? "}")
+	 * 		("=>" VALUE)?
+	 * 		"}"::F
+	 * 		
 	 * }
 	 */
 	public static class ValueTree extends TreeNode {
@@ -245,10 +275,12 @@ public class TextToolsTree extends ParserTree {
 		
 		public int tstart, tend;
 		
-		public ValueTree val2;
+		public ValueTree val2, then, _else;
 		public InnerNodeTree list;
 		
 		public boolean returnsString = true;
+
+		public ArrayList<ValueTree> arguments = new ArrayList<>();
 		
 		@Override
 		public void parse(TokenScanner s) throws SyntaxError {
@@ -280,6 +312,26 @@ public class TextToolsTree extends ParserTree {
 				list.parse(s);
 				accept(")", s);
 			}
+			else if (val.equals(":")) {
+				var = next(s);
+			}
+			else if (val.equals(".")) {
+				var = next(s);
+				accept("(", s);
+				if (!seek(s).equals(")"))
+					while (true) {
+						ValueTree t = new ValueTree();
+						t.parse(s);	
+						arguments.add(t);
+
+						String str = accept(new String[] { ",", ")" }, s);
+
+						if (str.equals(")"))
+							break;
+					}
+				else
+					accept(")", s);
+			}
 			else if (seek(s).equals("=")) {
 				accept("=", s);
 				val2 = new ValueTree();
@@ -303,7 +355,19 @@ public class TextToolsTree extends ParserTree {
 				}
 			}
 			
+			if (seek(s).equals("=>")) {
+				accept("=>", s);
+				then = new ValueTree();
+				then.parse(s);
+				if (seek(s).equals("?>")) {
+					accept("?>", s);
+					_else = new ValueTree();
+					_else.parse(s);
+				}
+			}
+			
 			if (!returnsString) accept("}", s);
+
 		}
 
 		@Override

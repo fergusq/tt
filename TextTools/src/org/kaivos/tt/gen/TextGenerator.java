@@ -47,12 +47,14 @@ public class TextGenerator {
 	
 	private HashMap<String, String> properties;
 	
-	private HashMap<String, String> vars = new HashMap<>();
+	private TTScope vars;
 	
 	public String generate(StartTree tree) throws ImpossibleException {
 		start = tree;
 		
 		node = "<top>";
+		
+		vars = new TTScope();
 		
 		for (GlobalTree g : start.globals) {
 			try {
@@ -138,18 +140,18 @@ public class TextGenerator {
 		loop: for (int i = 0; i < times; i++) {
 		
 			if (t.val.startsWith("\"")) {
-				if (t.returnsString) ans += t.val.substring(1, t.val.length()-1);
+				ans += t.val.substring(1, t.val.length()-1);
 				continue;
 			}
 			else if (t.val.equals("$")){
 				if (t.val2 != null){
 					String s = generateValue(t.val2);
 					vars.put(t.var, s);
-					if (t.returnsString) ans += s;
+					ans += s;
 					continue;
 				}
 				if (vars.get(t.var)==null) throw new NullPointerException(t.var + " is null");
-				if (t.returnsString) ans += vars.get(t.var);
+				ans += vars.get(t.var);
 				continue;
 			}
 			else if (t.val.equals("[")){
@@ -161,7 +163,7 @@ public class TextGenerator {
 						
 						int list = rnd.nextInt(node.properties.size());
 						
-						if (t.returnsString) ans += node.properties.get(list).get(t.property);
+						ans += node.properties.get(list).get(t.property);
 						continue loop;
 					}
 				}
@@ -169,19 +171,29 @@ public class TextGenerator {
 				throw new RuntimeException("Unresolved node " + t.var);
 			}
 			else if (t.val.equals("(")){
-				if (t.returnsString) ans += generateInnerNode(t.list);
+				ans += generateInnerNode(t.list);
+				continue;
+			}
+			else if (t.val.equals(":")){
+				ans += generateNamedValue(t.var);
+				continue;
+			}
+			else if (t.val.equals(".")){
+				String[] args = new String[t.arguments.size()];
+				for (int j = 0; j < t.arguments.size(); j++) args[j] = generateValue(t.arguments.get(j));
+				ans += generateCall(t.var, args);
 				continue;
 			}
 			else if (t.val2 != null){
 				String s = generateValue(t.val2);
 				properties.put(t.val, s);
-				if (t.returnsString) ans += s;
+				ans += s;
 				continue;
 			}
 			else {
 				for (NodeTree node : start.nodes) {
-					if (node.name.equals(t.val)) {
-						if (t.returnsString) ans += generateNode(node);
+					if (!node.isFunc && node.name.equals(t.val)) {
+						ans += generateNode(node);
 						continue loop;
 					}
 				}
@@ -191,7 +203,69 @@ public class TextGenerator {
 		
 		}
 		
+		if (t.then != null) {
+			if (!ans.isEmpty()) {
+				ans = generateValue(t.then);
+			} else if (t._else != null) {
+				ans = generateValue(t._else);
+			} else {
+				ans = "";
+			}
+		}
+		
+		if (!t.returnsString) return "";
+		
 		return ans;
+	}
+
+	private String generateCall(String var, String... args) throws ImpossibleException {
+		for (NodeTree node : start.nodes) {
+			if (node.isFunc && node.name.equals(var)) {
+				if (args.length != node.params.size()) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+				
+				vars = new TTScope(vars);
+				
+				for (int i = 0; i < args.length; i++) {
+					vars.putNew(node.params.get(i), args[i]);
+				}
+				
+				String ans = generateNode(node);
+				
+				vars = vars.getSuper();
+				return ans;
+			}
+		}
+		if (var.equals("eq")) {
+			if (args.length != 2) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return generateNamedValue(""+args[0].equals(args[1]));
+		}
+		if (var.equals("substr")) {
+			if (args.length != 2) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return args[0].substring(Integer.parseInt(args[1]));
+		}
+		if (var.equals("len")) {
+			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return args[0].length()+"";
+		}
+		if (var.equals("stars")) {
+			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			String ans = "";
+			int len = Integer.parseInt(args[0]);
+			for (int i = 0; i < len; i++) ans += "*";
+			return ans;
+		}
+		return null;
+	}
+
+	private String generateNamedValue(String var) {
+		switch (var) {
+		case "true":
+			return "1";
+		case "false":
+			return "";
+		default:
+			throw new RuntimeException("Unresolved value " + var);
+		}
 	}
 
 }

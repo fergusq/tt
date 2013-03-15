@@ -1,0 +1,18 @@
+
+start:
+	.fibloop("fibonacci sequence","")
+;
+
+.fibloop($i, $n):
+	.eq(.len($n), "100") => $i ?> (
+
+		{$a=.len(.fib($n))}
+		$i (.eq($n, "")=> "  " ?> ", ") .fibloop($a, ($n "*"))
+	)
+;
+
+.fib($i):
+	.eq($i, "" ) => ""  ?>
+	.eq($i, "*") => "*" ?>
+	(.substr($i, "1") .substr($i, "2"))
+;
