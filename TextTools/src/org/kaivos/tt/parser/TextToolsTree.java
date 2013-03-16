@@ -271,11 +271,11 @@ public class TextToolsTree extends ParserTree {
 	 */
 	public static class ValueTree extends TreeNode {
 		
-		public String val, var, property, how_many;
+		public String val, var, property, how_many, op, op2;
 		
 		public int tstart, tend;
 		
-		public ValueTree val2, then, _else;
+		public ValueTree val2, then, _else, or;
 		public InnerNodeTree list;
 		
 		public boolean returnsString = true;
@@ -300,12 +300,23 @@ public class TextToolsTree extends ParserTree {
 				}
 			}
 			else if (val.equals("[")) {
-				var = next(s);
+				
 				if (seek(s).equals("::")) {
 					accept("::", s);
+					
+					var = null;
+					
 					property = next(s);
-				} else property = "name";
-				accept("]", s);
+					accept("]", s);
+					
+				} else {
+					var = next(s);
+					if (seek(s).equals("::")) {
+						accept("::", s);
+						property = next(s);
+					} else property = "name";
+					accept("]", s);
+				}
 			}
 			else if (val.equals("(")) {
 				list = new InnerNodeTree();
@@ -333,7 +344,7 @@ public class TextToolsTree extends ParserTree {
 					accept(")", s);
 			}
 			else if (seek(s).equals("=")) {
-				accept("=", s);
+				accept(op = "=", s);
 				val2 = new ValueTree();
 				val2.parse(s);
 			}
@@ -353,6 +364,18 @@ public class TextToolsTree extends ParserTree {
 					}
 					accept("}", s);
 				}
+			}
+			
+			if (seek(s).equals(">")) {
+				accept(op2=">", s);
+				or = new ValueTree();
+				or.parse(s);
+			}
+			
+			else if (seek(s).equals(">>")) {
+				accept(op2=">>", s);
+				or = new ValueTree();
+				or.parse(s);
 			}
 			
 			if (seek(s).equals("=>")) {

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 //import java.io.InputStreamReader;
 
 import org.kaivos.sc.TokenScanner;
@@ -37,6 +38,17 @@ public class TextToolsParser {
 			System.err.println("Wrong number of arguments!");
 			return;
 		}
+		String seed = null;
+		
+		class Var<K, V> {
+			public Var(K n, V v) {
+				name = n; value = v;
+			}
+			public K name;
+			public V value;
+		}
+		
+		ArrayList<Var<String, String>> vars = new ArrayList<>();
 		if (args.length > 0) {
 			loop: for (int i = 0; i < args.length; i++) {
 				String arg = args[i];
@@ -45,7 +57,9 @@ public class TextToolsParser {
 					case "-h":
 					case "--help":
 						System.out.println(
-									"Usage: tt file             Process file\n" +
+									"Usage: tt [-s seed] [--seed seed]      \n" +
+									"[-g var value] [--global var value]    \n" +
+									"                           Process file\n" +
 									"       tt [-h|--help]      Show this text and exit\n" +
 									"       tt [-v|--version]   Show version and exit\n" +
 									"       tt [--version-str]  Show version string and exit"
@@ -61,6 +75,14 @@ public class TextToolsParser {
 								"VERSION 0001"		
 						);
 						return;
+					case "-s":
+					case "--seed":
+						seed = args[++i];
+						break;
+					case "-g":
+					case "--global":
+						vars.add(new Var<>(args[++i], args[++i]));
+						break;
 					default:
 						break loop;
 					}
@@ -88,8 +110,8 @@ public class TextToolsParser {
 		}
 
 		TokenScanner s = new TokenScanner();
-		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!', '.'});
-		s.setBSpecialTokens(new String[] {"::", "=>", "?>"});
+		s.setSpecialTokens(new char[] { ';', ',', ':', '$', '[', ']', '=', '(', ')', '*', '?', '{', '}', '|', '!', '.', '<', '>'});
+		s.setBSpecialTokens(new String[] {"::", "=>", "?>", ">>"});
 		s.setComments(true);
 		s.setPrep(false);
 		s.init(textIn);
@@ -104,6 +126,11 @@ public class TextToolsParser {
 				e1.printStackTrace();
 			}
 			TextGenerator compiler = new TextGenerator();
+			
+			for (Var<String, String> v : vars) {
+				compiler.vars.put(v.name, v.value);
+			}
+			
 			try {
 				System.out.println(compiler.generate(tree));
 			} catch (ImpossibleException e) {

@@ -4,7 +4,7 @@ start:
 ;
 
 .fibloop($i, $n):
-	.eq(.len($n), "100") => $i ?> (
+	.eq(.len($n), "30") => $i ?> (
 
 		{$a=.len(.fib($n))}
 		$i (.eq($n, "")=> "  " ?> ", ") .fibloop($a, ($n "*"))

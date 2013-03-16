@@ -19,6 +19,7 @@
 package org.kaivos.tt.gen;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 import org.kaivos.tt.parser.TextToolsTree.GlobalTree;
@@ -45,9 +46,11 @@ public class TextGenerator {
 	private NodeTree _node;
 	private StartTree start;
 	
+	private HashMap<String, String> curr_p_node;
+	
 	private HashMap<String, String> properties;
 	
-	private TTScope vars;
+	public TTScope vars;
 	
 	public String generate(StartTree tree) throws ImpossibleException {
 		start = tree;
@@ -154,21 +157,25 @@ public class TextGenerator {
 				ans += vars.get(t.var);
 				continue;
 			}
-			else if (t.val.equals("[")){
-				for (NodeTree node : start.nodes) {
-					if (node.name.equals(t.var)) {
-						//System.err.println(node.properties);
-						
-						if (node.properties.size() == 0) throw new ImpossibleException();
-						
-						int list = rnd.nextInt(node.properties.size());
-						
-						ans += node.properties.get(list).get(t.property);
-						continue loop;
+			else if (t.val.equals("[")) {
+				HashMap<String, String> n = null;
+				if (t.var != null)
+					for (NodeTree node : start.nodes) {
+						if (node.name.equals(t.var)) {
+							//System.err.println(node.properties);
+							
+							if (node.properties.size() == 0) throw new ImpossibleException();
+							
+							n = curr_p_node = node.properties.get(rnd.nextInt(node.properties.size()));
+						}
 					}
-				}
+				else n = curr_p_node;
+				if (n == null) throw new RuntimeException("Unresolved node " + t.var);
 				
-				throw new RuntimeException("Unresolved node " + t.var);
+				ans += n.get(t.property);
+				continue loop;
+				
+				
 			}
 			else if (t.val.equals("(")){
 				ans += generateInnerNode(t.list);
@@ -184,7 +191,7 @@ public class TextGenerator {
 				ans += generateCall(t.var, args);
 				continue;
 			}
-			else if (t.val2 != null){
+			else if ("=".equals(t.op) && t.val2 != null){
 				String s = generateValue(t.val2);
 				properties.put(t.val, s);
 				ans += s;
@@ -201,6 +208,16 @@ public class TextGenerator {
 				throw new RuntimeException("Unresolved node " + t.val);
 			}
 		
+		}
+		
+		if (t.or != null) {
+			
+			boolean flag = false;
+			
+			if (t.op2.equals(">")) flag = rnd.nextBoolean();
+			if (t.op2.equals(">>")) flag = rnd.nextInt(3)==0;
+			
+			if (flag) ans = generateValue(t.or);
 		}
 		
 		if (t.then != null) {
@@ -240,8 +257,11 @@ public class TextGenerator {
 			return generateNamedValue(""+args[0].equals(args[1]));
 		}
 		if (var.equals("substr")) {
-			if (args.length != 2) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
-			return args[0].substring(Integer.parseInt(args[1]));
+			if (args.length == 2)
+				return args[0].substring(Integer.parseInt(args[1]));
+			else if (args.length == 3)
+				return args[0].substring(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+			else throw new RuntimeException("can't call " + var + ": wrong number of arguments");
 		}
 		if (var.equals("len")) {
 			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
@@ -253,6 +273,18 @@ public class TextGenerator {
 			int len = Integer.parseInt(args[0]);
 			for (int i = 0; i < len; i++) ans += "*";
 			return ans;
+		}
+		if (var.equals("to_up")) {
+			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return args[0].toUpperCase(Locale.ENGLISH);
+		}
+		if (var.equals("f_to_up")) {
+			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return args[0].substring(0, 1).toUpperCase(Locale.ENGLISH) + args[0].substring(1);
+		}
+		if (var.equals("to_low")) {
+			if (args.length != 1) throw new RuntimeException("can't call " + var + ": wrong number of arguments");
+			return args[0].toLowerCase(Locale.ENGLISH);
 		}
 		return null;
 	}
