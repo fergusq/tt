@@ -1,0 +1,28 @@
+# Generates "Asterix" style names
+
+start:
+	b1 b2 end
+;
+
+b1:
+	"As",
+	"Se",
+	"Teo",
+	"O"
+;
+
+b2:
+	"te",
+	"ni",
+	"ne",
+	"du",
+	"be"
+;
+
+end:
+	"rix",
+	"nix",
+	"lix",
+	"lux",
+	"line"
+;
