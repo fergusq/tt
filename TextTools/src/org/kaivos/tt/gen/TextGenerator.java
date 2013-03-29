@@ -94,6 +94,8 @@ public class TextGenerator {
 				String s = generateList(t.lists.get(list));
 				node = n; _node = _n;
 				
+				if (!properties.containsKey("name")) properties.put("name", s);
+				
 				t.properties.add(properties);
 				
 				properties = p;
